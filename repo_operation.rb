@@ -1,5 +1,6 @@
 require 'dotenv'
 require 'octokit'
+require 'csv'
 
 Dotenv.load
 
@@ -32,6 +33,17 @@ class RepoOperation
       end
     end
     puts "finished! admin user num: #{user_num}"
+  end
+
+  def add_users_from_csv(path, header=true)
+    csv_data = CSV.read(File.expand_path('./data/' + path), headers: header)
+    user_num = 0
+    csv_data.each do |user|
+      @client.add_collaborator(@repo_name, user['github'])
+      user_num += 1
+      puts "Add #{user['github']} to repository."
+    end
+    puts "finished! add users num: #{user_num}"
   end
 
   def remove_users_except_admin()

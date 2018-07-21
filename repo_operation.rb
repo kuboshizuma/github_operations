@@ -39,9 +39,12 @@ class RepoOperation
     csv_data = CSV.read(File.expand_path('./data/' + path), headers: header)
     user_num = 0
     csv_data.each do |user|
-      @client.add_collaborator(@repo_name, user['github'])
-      user_num += 1
-      puts "Add #{user['github']} to repository."
+      if @client.add_collaborator(@repo_name, user['github'])
+        user_num += 1
+        puts "Add #{user['github']} to repository."
+      else
+        puts "Error has occured: #{user['github']}."
+      end
     end
     puts "finished! add users num: #{user_num}"
   end

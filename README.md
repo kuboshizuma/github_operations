@@ -29,7 +29,29 @@ REPO_NAME=kuboshizuma/github_operations (target repository name)
 
 ### 2. execute script
 
-For example, to remove those who don't have admin privileges from the repository, do as follows.
+#### add users from csv
+
+To add users from csv, you need to prepare csv file for users' github id.
+The csv file should be like the following, which needs to include "github' column.
+
+```
+name,github
+test,github_id
+test1,github_id_1
+test2,github_id_2
+test3,github_id_3
+test4,github_id_4
+```
+
+After placing the csv file to `data/users.csv`, do as follows.
+
+```
+$ ruby add_users_from_csv.rb users.csv
+```
+
+#### remove users except admin permission users
+
+To remove those who don't have admin privileges from the repository, do as follows.
 
 ```
 $ ruby remove_users_from_repo.rb

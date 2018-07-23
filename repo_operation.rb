@@ -35,15 +35,41 @@ class RepoOperation
     puts "finished! admin user num: #{user_num}"
   end
 
-  def add_users_from_csv(path, header=true)
+  def fetch_organization_team(org=ENV['ORGANIZATION_NAME'], team_name=ENV['TEAM_NAME'])
+    res = @client.organization_teams(org)
+    team = res.select {|team| team[:name] == team_name}
+    return team[0]
+  end
+
+  def invite_users_to_org_from_csv(path, skip=0, header=true)
     csv_data = CSV.read(File.expand_path('./data/' + path), headers: header)
+    team_id = fetch_organization_team()[:id]
     user_num = 0
-    csv_data.each do |user|
-      if @client.add_collaborator(@repo_name, user['github'])
+    csv_data.each_with_index do |user, i|
+      next if i < skip
+      begin
+        @client.update_organization_membership(ENV['ORGANIZATION_NAME'], {user: user['github'], state: 'active', role: 'member'})
+        @client.add_team_membership(team_id, user['github'])
         user_num += 1
         puts "Add #{user['github']} to repository."
-      else
-        puts "Error has occured: #{user['github']}."
+      rescue => e
+        puts "Error has occured for #{user['github']}.: #{e}"
+      end
+    end
+    puts "finished! invite users to #{ENV['ORGANIZATION_NAME']}: #{user_num}"
+  end
+
+  def add_users_from_csv(path, skip=0, header=true)
+    csv_data = CSV.read(File.expand_path('./data/' + path), headers: header)
+    user_num = 0
+    csv_data.each_with_index do |user, i|
+      next if i < skip
+      begin
+        @client.add_collaborator(@repo_name, user['github'])
+        user_num += 1
+        puts "Add #{user['github']} to repository."
+      rescue => e
+        puts "Error has occured for #{user['github']}.: #{e}"
       end
     end
     puts "finished! add users num: #{user_num}"

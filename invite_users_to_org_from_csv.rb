@@ -1,7 +1,7 @@
 require_relative 'repo_operation'
 
 operation = RepoOperation.new(owner=ENV['OWNER_NAME'], repo_name=ENV['REPO_NAME'])
-operation.add_users_from_csv(path=ARGV[0], skip=177)
+operation.invite_users_to_org_from_csv(path=ARGV[0], skip=0)
 
 
 =begin
